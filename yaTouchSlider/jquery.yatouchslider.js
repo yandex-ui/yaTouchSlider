@@ -14,11 +14,11 @@
     $.fn.yaTouchSlider = function(options) {
 
         var defaults = {
-            step: undefined,
-            threshold: 30, 
-            acceleration: true,
-            preventVert: true,
-            preventVertThreshold: 5
+            step: undefined, // step
+            threshold: 30, // threshold (pixels) that must be overcome
+            acceleration: true, // enable/disable slider acceleration boost
+            preventVert: true, // prevent vertical scroll while sliding
+            preventVertThreshold: 5 // vertical scroll preventing threshold (pixels)
         };
 
         options = $.extend(defaults, options);
@@ -42,11 +42,12 @@
                     shiftAbs = Math.abs(shift);
 
                     var timeShift = Date.now() - t1,
-                        speed = shiftAbs / timeShift,
+                        speed = shiftAbs / timeShift, // pixels in ms
                         accel = 1,
                         animationTime = '0.2',
                         step = options.step;
 
+                    // slider acceleration
                     if (options.acceleration) {
                         accel = speed > 0.3 && speed < 0.6 ? 2 :
                                 speed >= 0.6 && speed < 1 ? 3 :
@@ -57,10 +58,12 @@
                     }
 
                     if (shiftAbs > options.threshold || !t1) {
+                        // more than one step
                         if (shiftAbs > step) {
                             currentX += ~~(shift/step)*step;
                         }
 
+                        // left or right direction
                         if (shift > 0) {
                             currentX += step * accel;
                             currentI -= accel;
@@ -69,6 +72,7 @@
                             currentI += accel;
                         }
 
+                        // left or right limit
                         if (currentX > 0) {
                             currentX = currentI = 0;
                         } else if (currentX < limitX) {
@@ -77,22 +81,29 @@
                         }
                     }
 
-                    $(el)
-                        .css({
-                            '-webkit-transition':'-webkit-transform ' + animationTime + 's ease-out',
-                            '-webkit-transform': 'translate3d(' + currentX + 'px, 0, 0)'
-                        })
-                        .trigger('slide', {
-                            currentX: currentX,
-                            limitX: limitX,
-                            currentI: currentI,
-                            limitI: limitI,
-                            speed: speed.toFixed(2),
-                            timeShift: timeShift,
-                            acceleration: accel,
-                            animationTime: animationTime
+                    // callback after each slide
+                    if (options.callback) {
+                        $(el).one('webkitTransitionEnd', function() {
+                            options.callback({
+                                currentX: currentX,
+                                limitX: limitX,
+                                currentI: currentI,
+                                limitI: limitI,
+                                speed: speed.toFixed(2),
+                                timeShift: timeShift,
+                                acceleration: accel,
+                                animationTime: animationTime
+                            });
                         });
+                    }
 
+                    // animate to calculated position
+                    $(el).css({
+                        '-webkit-transition':'-webkit-transform ' + animationTime + 's ease-out',
+                        '-webkit-transform': 'translate3d(' + currentX + 'px, 0, 0)'
+                    });
+
+                    // reset
                     x1 = y1 = shiftX = shiftY = t1 = undefined;
                 };
 
@@ -100,6 +111,7 @@
                 $(el)
                     .css('-webkit-transform', 'translateZ(0)')
                     .bind({
+                        // start
                         'touchstart.touchSlides': function(e) {
                             var eo = e.originalEvent.touches[0];
                             x1 = eo.pageX;
@@ -108,6 +120,7 @@
                             t1 = Date.now();
                         },
 
+                        // move
                         'touchmove.touchSlides': function(e) {
                             var eo = e.originalEvent.touches[0];
                             shiftX = eo.pageX - x1;
@@ -119,23 +132,28 @@
                             }
                         },
 
+                        // end
                         'touchend.touchSlides': function(e) {
                             slide(shiftX);
                         },
 
+                        // cancel / reset
                         'touchcancel.touchSlides': function() {
                             x1 = y1 = shiftX = shiftY = t1 = undefined;
                         },
 
+                        // left custom slide event
                         'slideLeft.touchSlides': function(e, step) {
                             slide(step || options.step);
                         },
 
+                        // right custom slide event
                         'slideRight.touchSlides': function(e, step) {
                             slide(-step || -options.step);
                         }
                     });
 
+                // correction of current position after device rotation
                 $(window).bind('orientationchange', function() {
                     if (Math.abs(window.orientation) == 90 && currentX - limitX <= window.innerWidth) {
                         currentX = limitX = window.innerWidth - width;
@@ -150,6 +168,7 @@
 
     };
 
+    // untouch
     $.fn.yaUntouchSlider = function() {
 
         return this.each(function(i, el) {

@@ -30,21 +30,21 @@
     <script>
         $('.b-menu')
             .yaTouchSlider({
-                step: 100
-            })
-            .bind('slide', function(e, data) {
-                var list = $('<ul>', {
-                    'class': 'b-debug__list'
-                });
+                step: 100,
+                callback: function(data) {
+                    var list = $('<ul>', {
+                        'class': 'b-debug__list'
+                    });
 
-                $.each(data, function(key, val) {
-                    list.append($('<li>', {
-                        'class': 'b-debug__item',
-                         'text': key + ': ' + val
-                    }))
-                });
+                    $.each(data, function(key, val) {
+                        list.append($('<li>', {
+                            'class': 'b-debug__item',
+                             'text': key + ': ' + val
+                        }))
+                    });
 
-                $('.b-debug').html(list);
+                    $('.b-debug').html(list);
+                }
             });
     </script>
 </body>
