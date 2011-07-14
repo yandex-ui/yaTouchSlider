@@ -1,0 +1,26 @@
+.b-page {
+    margin: 0;
+    -webkit-text-size-adjust: none;
+}
+.b-wrapper {
+    overflow: hidden;
+}
+.b-menu {
+    float: left;
+    display: -webkit-box;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.b-menu__item {
+    font-size: 96px;
+    color: #ccc;
+    text-align: center;
+    width: 120px;
+    height: 120px;
+    background: #eee;
+    border: 2px solid #ccc;
+}
+.b-menu__item + .b-menu__item {
+    margin-left: 10px;
+}

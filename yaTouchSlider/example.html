@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<head>
+    <title>touchSlider example</title>
+    <meta name="viewport" content="width=device-width,maximum-scale=1,initial-scale=1,user-scalable=0" />
+
+    <link rel="stylesheet" href="example.css" />
+    <script src="http://yandex.st/jquery/1.6.2/jquery.min.js"></script>
+    <script src="jquery.yatouchslider.js"></script>
+</head>
+
+<body class="b-page">
+    <div class="b-wrapper">
+        <ul class="b-menu">
+            <li class="b-menu__item">1</li>
+            <li class="b-menu__item">2</li>
+            <li class="b-menu__item">3</li>
+            <li class="b-menu__item">4</li>
+            <li class="b-menu__item">5</li>
+            <li class="b-menu__item">6</li>
+            <li class="b-menu__item">7</li>
+            <li class="b-menu__item">8</li>
+            <li class="b-menu__item">9</li>
+            <li class="b-menu__item">10</li>
+        </ul>
+    </div>
+
+    <div class="b-debug"></div>
+
+    <script>
+        $('.b-menu')
+            .yaTouchSlider({
+                step: 100
+            })
+            .bind('slide', function(e, data) {
+                var list = $('<ul>', {
+                    'class': 'b-debug__list'
+                });
+
+                $.each(data, function(key, val) {
+                    list.append($('<li>', {
+                        'class': 'b-debug__item',
+                         'text': key + ': ' + val
+                    }))
+                });
+
+                $('.b-debug').html(list);
+            });
+    </script>
+</body>
