@@ -19,11 +19,12 @@
             acceleration: true, // enable/disable slider acceleration boost
             preventVert: true, // prevent vertical scroll while sliding
             preventVertThreshold: 5 // vertical scroll preventing threshold (pixels)
-        };
+        },
+        step;
 
         options = $.extend(defaults, options);
 
-        options.step = options.step || window.innerWidth; // step or the whole screen width
+        step = options.step || window.innerWidth; // step or the whole screen width
 
         return this.each(function(i, el) {
 
@@ -32,9 +33,9 @@
                 t1,
                 width = $(el).outerWidth(), // actual width
                 currentX = (new WebKitCSSMatrix(getComputedStyle(el).webkitTransform)).m41, // initial shift
-                currentI = ~~(-currentX / options.step), // initial index
+                currentI = ~~(-currentX / step), // initial index
                 limitX = window.innerWidth - width, // max shift
-                limitI = ~~(-limitX / options.step) || 1; // max index
+                limitI = Math.ceil(-limitX / step) || 1; // max index
 
             if (width > window.innerWidth) {
 
@@ -44,8 +45,7 @@
                     var timeShift = Date.now() - t1,
                         speed = shiftAbs / timeShift, // pixels in ms
                         accel = 1,
-                        animationTime = '0.2',
-                        step = options.step;
+                        animationTime = '0.2';
 
                     // slider acceleration
                     if (options.acceleration) {
@@ -143,23 +143,28 @@
                         },
 
                         // left custom slide event
-                        'slideLeft.touchSlides': function(e, step) {
-                            slide(step || options.step);
+                        'slideLeft.touchSlides': function(e, customStep) {
+                            slide(customStep || step);
                         },
 
                         // right custom slide event
                         'slideRight.touchSlides': function(e, step) {
-                            slide(-step || -options.step);
+                            slide(-customStep || -step);
                         }
                     });
 
                 // correction of current position after device rotation
                 $(window).bind('orientationchange', function() {
+                    step = options.step || window.innerWidth;
+
                     if (Math.abs(window.orientation) == 90 && currentX - limitX <= window.innerWidth) {
                         currentX = limitX = window.innerWidth - width;
+                        currentI++;
                         slide(0);
                     } else {
                         limitX = window.innerWidth - width;
+                        currentI = currentI - Math.ceil((currentX - limitX)/step);
+                        slide(0);
                     }
                 });
 
