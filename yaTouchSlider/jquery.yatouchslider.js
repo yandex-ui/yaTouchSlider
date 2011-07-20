@@ -148,7 +148,7 @@
                         },
 
                         // right custom slide event
-                        'slideRight.touchSlides': function(e, step) {
+                        'slideRight.touchSlides': function(e, customStep) {
                             slide(-customStep || -step);
                         }
                     });
